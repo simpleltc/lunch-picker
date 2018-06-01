@@ -1,6 +1,7 @@
 import random
 import requests
 import os
+import pika
 from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
 
@@ -32,7 +33,10 @@ url = choice.url.split('?')[0]
 with open('drivers', 'r') as f:
     drivers = f.readlines()
 
-body = {'message': u'THE PEOPLE\'S LUNCH will be {}.\n{} has been chosen to drive.\n{}'
-    .format(choice.name, random.choice(drivers).strip(), url), 'message_format': 'text', 'color': 'yellow',
-        'notify': True}
-requests.post(os.getenv('HIPCHAT_URL'), body)
+connection = pika.BlockingConnection(pika.URLParameters(os.getenv('AMQP_URI')))
+channel = connection.channel()
+channel.basic_publish('sltc.ops', 'notify.hipchat',
+                      json.dumps({'message': u'THE PEOPLE\'S LUNCH will be {}.\n{} has been chosen to drive.\n{}'.format(
+                          choice.name, random.choice(drivers).strip(), url),
+                          'key': 'notify.hipchat',
+                          'room': 'lunch'}))
