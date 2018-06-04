@@ -1,0 +1,48 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: lunchpicker
+spec:
+  schedule: "30 10 * * MON-FRI"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: lunchpicker
+            image: gcr.io/simpleltc-183519/lunchpicker:6
+            env:
+              - name: AMQP_URI
+                valueFrom:
+                  secretKeyRef:
+                    name: lunchpicker
+                    key: AMQP_URI
+              - name: CONSUMER_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: lunchpicker
+                    key: CONSUMER_KEY
+              - name: CONSUMER_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: lunchpicker
+                    key: CONSUMER_SECRET
+              - name: TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: lunchpicker
+                    key: TOKEN
+              - name: TOKEN_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: lunchpicker
+                    key: TOKEN_SECRET
+              - name: SEARCH_RADIUS
+                value: "8000"
+              - name: SEARCH_OFFSET
+                value: "50"
+              - name: SEARCH_LAT
+                value: "32.986467"
+              - name: SEARCH_LONG
+                value: "-96.713797"
+          restartPolicy: OnFailure
