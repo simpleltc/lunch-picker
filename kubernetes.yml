@@ -3,7 +3,8 @@ kind: CronJob
 metadata:
   name: lunchpicker
 spec:
-  schedule: "30 10 * * MON-FRI"
+#Time must be in UTC.
+  schedule: "30 15 * * MON-FRI"
   jobTemplate:
     spec:
       template:
